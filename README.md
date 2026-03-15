@@ -21,3 +21,11 @@ wp-content/plugins/
 
 3. Activate the plugin
 4. Go to Tools → Code Search
+
+## Screenshots
+
+### Search interface
+![Search interface](assets/screenshot-1.png)
+
+### Results table
+![Results](assets/screenshot-2.png)
