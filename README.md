@@ -6,30 +6,18 @@ It allows administrators to search for text inside active theme and plugin files
 
 ## Features
 
-- Admin-only access
-- Search active plugins
-- Search active theme and parent theme
-- Custom file extensions
-- Line-by-line scanning
-- Highlighted matches
-- No external requests or tracking
+• Search active plugins  
+• Search active theme and parent theme  
+• Custom file extensions  
+• Line-by-line scanning  
+• Highlighted matches  
 
 ## Installation
 
-1. Download or clone this repository
-2. Copy the `admin-code-search` folder into: wp-content/plugins/
+1. Download the repository
+2. Copy the `admin-code-search` folder to:
 
-3. Activate the plugin in WordPress
-4. Go to **Tools → Code Search**
+wp-content/plugins/
 
-## Screenshot
-
-Search interface and results table inside WordPress admin.
-
-## WordPress Plugin Directory
-
-(Will be added after plugin approval.)
-
-## License
-
-GPLv2 or later
+3. Activate the plugin
+4. Go to Tools → Code Search
