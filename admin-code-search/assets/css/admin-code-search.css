@@ -1,0 +1,19 @@
+.acs-results-table .acs-file-cell {
+	word-break: break-all;
+}
+
+.acs-results-table .acs-snippet {
+	display: block;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.acs-results-table mark {
+	padding: 0 2px;
+	background: #ffef9f;
+	color: inherit;
+	border-radius: 2px;
+}
