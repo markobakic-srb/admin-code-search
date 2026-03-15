@@ -50,3 +50,8 @@ Yes. Enter comma-separated extensions such as `php,inc,module`.
 
 = 1.0.0 =
 * Initial public release.
+
+== Screenshots ==
+
+1. Admin Code Search interface in Tools → Code Search.
+2. Search results showing matching lines inside plugin and theme files.
