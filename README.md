@@ -25,7 +25,7 @@ wp-content/plugins/
 ## Screenshots
 
 ### Search interface
-![Search interface](admin-code-search/assets/screenshot-1.png)
+![Search interface](assets/screenshot-1.png)
 
 ### Results table
-![Results](admin-code-search/assets/screenshot-2.png)
+![Results](assets/screenshot-2.png)
