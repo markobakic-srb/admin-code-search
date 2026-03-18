@@ -1,5 +1,5 @@
 === Admin Code Search ===
-Contributors: markobakic
+Contributors: markobakic-srb
 Tags: developer, code, search, admin tools, debugging
 Requires at least: 6.0
 Tested up to: 6.8
