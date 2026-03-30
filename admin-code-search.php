@@ -15,19 +15,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ACS_VERSION', '1.0.0' );
-define( 'ACS_FILE', __FILE__ );
-define( 'ACS_PATH', plugin_dir_path( __FILE__ ) );
-define( 'ACS_URL', plugin_dir_url( __FILE__ ) );
-define( 'ACS_BASENAME', plugin_basename( __FILE__ ) );
+define( 'ADCOSE_VERSION', '1.0.0' );
+define( 'ADCOSE_FILE', __FILE__ );
+define( 'ADCOSE_PATH', plugin_dir_path( __FILE__ ) );
+define( 'ADCOSE_URL', plugin_dir_url( __FILE__ ) );
+define( 'ADCOSE_BASENAME', plugin_basename( __FILE__ ) );
 
-require_once ACS_PATH . 'includes/class-acs-helpers.php';
-require_once ACS_PATH . 'includes/class-acs-scanner.php';
-require_once ACS_PATH . 'includes/class-acs-admin-page.php';
-require_once ACS_PATH . 'includes/class-acs-plugin.php';
+require_once ADCOSE_PATH . 'includes/class-adcose-helpers.php';
+require_once ADCOSE_PATH . 'includes/class-adcose-scanner.php';
+require_once ADCOSE_PATH . 'includes/class-adcose-admin-page.php';
+require_once ADCOSE_PATH . 'includes/class-adcose-plugin.php';
 
-function acs_run_plugin() {
-	$plugin = new ACS_Plugin();
+function adcose_run_plugin() {
+	$plugin = new ADCOSE_Plugin();
 	$plugin->init();
 }
-acs_run_plugin();
+adcose_run_plugin();
