@@ -1,8 +1,8 @@
-.acs-results-table .acs-file-cell {
+.adcose-results-table .adcose-file-cell {
 	word-break: break-all;
 }
 
-.acs-results-table .acs-snippet {
+.adcose-results-table .adcose-snippet {
 	display: block;
 	white-space: pre-wrap;
 	word-break: break-word;
@@ -11,7 +11,7 @@
 	line-height: 1.5;
 }
 
-.acs-results-table mark {
+.adcose-results-table mark {
 	padding: 0 2px;
 	background: #ffef9f;
 	color: inherit;
