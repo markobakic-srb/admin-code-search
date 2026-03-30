@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ACS_Admin_Page {
+class ADCOSE_Admin_Page {
 
 	/**
 	 * Register Tools menu page.
@@ -16,7 +16,7 @@ class ACS_Admin_Page {
 			__( 'Code Search', 'admin-code-search' ),
 			__( 'Code Search', 'admin-code-search' ),
 			'manage_options',
-			'acs-code-search',
+			'adcose-code-search',
 			array( $this, 'render_page' )
 		);
 	}
@@ -45,7 +45,7 @@ class ACS_Admin_Page {
 
 		if ( $data['submitted'] && empty( $data['error'] ) ) {
 			if ( ! empty( $data['results'] ) ) {
-				$this->render_results( $data['results'] );
+				$this->render_results( $data['results'], $data['term'] );
 			} else {
 				echo '<div class="notice notice-info"><p>' . esc_html__( 'No matches found.', 'admin-code-search' ) . '</p></div>';
 			}
@@ -81,13 +81,13 @@ class ACS_Admin_Page {
 		$data['scan_plugins'] = isset( $_POST['scan_plugins'] );
 		$data['scan_themes']  = isset( $_POST['scan_themes'] );
 
-		if ( ! isset( $_POST['acs_do_search'] ) ) {
+		if ( ! isset( $_POST['adcose_do_search'] ) ) {
 			return $data;
 		}
 
 		$data['submitted'] = true;
 
-		check_admin_referer( 'acs_search_action', 'acs_search_nonce' );
+		check_admin_referer( 'adcose_search_action', 'adcose_search_nonce' );
 
 		if ( '' === trim( $data['term'] ) ) {
 			$data['error'] = __( 'Search term is required.', 'admin-code-search' );
@@ -102,7 +102,7 @@ class ACS_Admin_Page {
 		$dirs = array();
 
 		if ( $data['scan_plugins'] && defined( 'WP_PLUGIN_DIR' ) ) {
-			$dirs[] = WP_PLUGIN_DIR;
+			$dirs[] = wp_normalize_path( WP_PLUGIN_DIR );
 		}
 
 		if ( $data['scan_themes'] ) {
@@ -118,7 +118,7 @@ class ACS_Admin_Page {
 			}
 		}
 
-		$extensions = ACS_Helpers::normalize_extensions( $data['exts'] );
+		$extensions = ADCOSE_Helpers::normalize_extensions( $data['exts'] );
 
 		$exclude_names = array(
 			'vendor',
@@ -129,7 +129,7 @@ class ACS_Admin_Page {
 			'.svn',
 		);
 
-		$scanner = new ACS_Scanner();
+		$scanner = new ADCOSE_Scanner();
 		$data['results'] = $scanner->scan( $dirs, $data['term'], $extensions, $exclude_names );
 
 		return $data;
@@ -144,21 +144,21 @@ class ACS_Admin_Page {
 	private function render_form( $data ) {
 		echo '<form method="post" action="">';
 
-		wp_nonce_field( 'acs_search_action', 'acs_search_nonce' );
+		wp_nonce_field( 'adcose_search_action', 'adcose_search_nonce' );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		echo '<tr>';
-		echo '<th scope="row"><label for="acs-term">' . esc_html__( 'Search term', 'admin-code-search' ) . '</label></th>';
+		echo '<th scope="row"><label for="adcose-term">' . esc_html__( 'Search term', 'admin-code-search' ) . '</label></th>';
 		echo '<td>';
-		echo '<input name="term" id="acs-term" type="text" class="regular-text" value="' . esc_attr( $data['term'] ) . '" placeholder="' . esc_attr__( 'Type anything...', 'admin-code-search' ) . '">';
+		echo '<input name="term" id="adcose-term" type="text" class="regular-text" value="' . esc_attr( $data['term'] ) . '" placeholder="' . esc_attr__( 'Type anything...', 'admin-code-search' ) . '">';
 		echo '</td>';
 		echo '</tr>';
 
 		echo '<tr>';
-		echo '<th scope="row"><label for="acs-exts">' . esc_html__( 'Extensions', 'admin-code-search' ) . '</label></th>';
+		echo '<th scope="row"><label for="adcose-exts">' . esc_html__( 'Extensions', 'admin-code-search' ) . '</label></th>';
 		echo '<td>';
-		echo '<input name="exts" id="acs-exts" type="text" class="regular-text" value="' . esc_attr( $data['exts'] ) . '" placeholder="php,inc,module">';
+		echo '<input name="exts" id="adcose-exts" type="text" class="regular-text" value="' . esc_attr( $data['exts'] ) . '" placeholder="php,inc,module">';
 		echo '<p class="description">' . esc_html__( 'Comma-separated. Default: php', 'admin-code-search' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
@@ -176,7 +176,7 @@ class ACS_Admin_Page {
 		echo '<p class="description">' . esc_html__( 'Large searches may take time on sites with many plugins or large codebases.', 'admin-code-search' ) . '</p>';
 
 		echo '<p>';
-		echo '<button type="submit" name="acs_do_search" value="1" class="button button-primary">' . esc_html__( 'Search', 'admin-code-search' ) . '</button>';
+		echo '<button type="submit" name="adcose_do_search" value="1" class="button button-primary">' . esc_html__( 'Search', 'admin-code-search' ) . '</button>';
 		echo '</p>';
 
 		echo '</form>';
@@ -188,7 +188,7 @@ class ACS_Admin_Page {
 	 * @param array $results Search results.
 	 * @return void
 	 */
-	private function render_results( $results ) {
+	private function render_results( $results, $term ) {
 		$total_matches = 0;
 
 		foreach ( $results as $file => $rows ) {
@@ -200,7 +200,7 @@ class ACS_Admin_Page {
 		echo '<span class="description">(' . intval( $total_matches ) . ' ' . esc_html__( 'matches', 'admin-code-search' ) . ' ' . esc_html__( 'in', 'admin-code-search' ) . ' ' . intval( count( $results ) ) . ' ' . esc_html__( 'files', 'admin-code-search' ) . ')</span>';
 		echo '</h2>';
 
-		echo '<table class="widefat striped acs-results-table">';
+		echo '<table class="widefat striped adcose-results-table">';
 		echo '<thead><tr>';
 		echo '<th>' . esc_html__( 'File', 'admin-code-search' ) . '</th>';
 		echo '<th>' . esc_html__( 'Line', 'admin-code-search' ) . '</th>';
@@ -211,9 +211,16 @@ class ACS_Admin_Page {
 		foreach ( $results as $file => $rows ) {
 			foreach ( $rows as $row ) {
 				echo '<tr>';
-				echo '<td class="acs-file-cell">' . esc_html( ACS_Helpers::relative_path( $file ) ) . '</td>';
+				echo '<td class="adcose-file-cell">' . esc_html( ADCOSE_Helpers::relative_path( $file ) ) . '</td>';
 				echo '<td>' . intval( $row['line'] ) . '</td>';
-				echo '<td><code class="acs-snippet">' . ACS_Helpers::highlight_term( $row['text'], $this->get_current_term() ) . '</code></td>';
+				$highlighted = ADCOSE_Helpers::highlight_term( $row['text'], $term );
+
+echo '<td><code class="adcose-snippet">' . wp_kses(
+	$highlighted,
+	array(
+		'mark' => array(),
+	)
+) . '</code></td>';
 				echo '</tr>';
 			}
 		}
@@ -222,16 +229,4 @@ class ACS_Admin_Page {
 		echo '</table>';
 	}
 
-	/**
-	 * Get current term safely for output highlighting.
-	 *
-	 * @return string
-	 */
-	private function get_current_term() {
-		if ( isset( $_POST['term'] ) ) {
-			return sanitize_text_field( wp_unslash( $_POST['term'] ) );
-		}
-
-		return '';
-	}
 }
