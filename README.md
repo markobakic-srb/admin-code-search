@@ -74,10 +74,17 @@ This plugin does not send any data to external services.
 
 ## Screenshots
 
-1. Admin Code Search interface in Tools → Code Search  
-2. Search input with custom file extensions  
-3. Results showing matches across plugin and theme files  
-4. Detailed result with file path, line number, and highlighted match  
+### 1. Admin Code Search interface in Tools → Code Search
+![Admin Code Search interface](assets/screenshot-1.png)
+
+### 2. Search input with custom file extensions
+![Search input](assets/screenshot-2.png)
+
+### 3. Results showing matches across plugin and theme files
+![Results](assets/screenshot-3.png)
+
+### 4. Detailed result with file path, line number, and highlighted match
+![Detailed result](assets/screenshot-4.png)
 
 ---
 
