@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ACS_Scanner {
+class ADCOSE_Scanner {
 
 	/**
 	 * Scan directories for matching lines.
@@ -72,7 +72,8 @@ class ACS_Scanner {
 	 */
 	private function scan_file( $file_path, $term, &$results ) {
 		try {
-			$handle = @fopen( $file_path, 'r' );
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Line-by-line scanning is used intentionally to avoid loading full files into memory.
+$handle = @fopen( $file_path, 'r' );
 
 			if ( ! $handle ) {
 				return;
@@ -91,7 +92,8 @@ class ACS_Scanner {
 				}
 			}
 
-			fclose( $handle );
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Paired with fopen() for efficient line-by-line scanning.
+fclose( $handle );
 		} catch ( \Throwable $e ) {
 			// Ignore unreadable files.
 		}
