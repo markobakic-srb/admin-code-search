@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ACS_Helpers {
+class ADCOSE_Helpers {
 
 	/**
 	 * Normalize comma-separated extensions.
@@ -38,7 +38,7 @@ class ACS_Helpers {
 	 * @return string
 	 */
 	public static function relative_path( $absolute_path ) {
-		$root = wp_normalize_path( ABSPATH );
+		$root = wp_normalize_path( get_home_path() );
 		$path = wp_normalize_path( $absolute_path );
 
 		if ( 0 === strpos( $path, $root ) ) {
