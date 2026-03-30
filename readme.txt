@@ -1,8 +1,8 @@
 === Admin Code Search ===
-Contributors: markobakic-srb
+Contributors: marbak
 Tags: developer, code, search, admin tools, debugging
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -12,18 +12,22 @@ Search code inside active themes and plugins directly from the WordPress admin a
 
 == Description ==
 
-Admin Code Search is a lightweight developer utility for searching text inside active theme and plugin files from wp-admin.
+Admin Code Search is a lightweight developer utility that lets you search code inside active themes and plugins directly from the WordPress admin. Designed for developers who need quick insight into code without leaving wp-admin.
+
+Useful when you need to quickly locate a function, hook, class, or string without leaving the dashboard or accessing files via FTP or IDE.
 
 Features:
 - Admin-only access
-- Search active plugins
-- Search active theme and parent theme
-- Custom file extensions
-- Line-by-line matching
+- Search across active plugins
+- Search active theme (including parent theme)
+- Support for custom file extensions
+- Line-by-line results
 - Highlighted matches
-- Clean results table
+- Clean, readable results table
 
-This plugin does not send data to external services.
+= Privacy =
+
+This plugin does not send any data to external services.
 
 == Installation ==
 
@@ -40,18 +44,34 @@ Only administrators or users with the `manage_options` capability.
 
 = What files are searched? =
 
-The plugin searches active plugin files, the active theme, and the parent theme if different.
+The plugin searches files in active plugins, the active theme, and the parent theme (if used).
+Inactive plugins and themes are not included.
 
 = Can I search file types other than PHP? =
 
-Yes. Enter comma-separated extensions such as `php,inc,module`.
+Yes. You can define custom file extensions (for example: php, js, css, inc).
+
+= Does this affect site performance? =
+
+Search runs only when you perform it manually in the admin.
+It does not run in the background or affect frontend performance.
+
+= Does this plugin modify any files? =
+
+No. The plugin is read-only and does not change any files.
+
+= Is any data sent outside my site? =
+
+No. All searches are performed locally on your server.
+
+== Screenshots ==
+
+1. Admin Code Search interface in Tools → Code Search
+2. Search input with custom file extensions
+3. Results showing matches across plugin and theme files
+4. Detailed result with file path, line number, and highlighted match
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial public release.
-
-== Screenshots ==
-
-1. Admin Code Search interface in Tools → Code Search.
-2. Search results showing matching lines inside plugin and theme files.
