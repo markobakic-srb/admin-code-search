@@ -90,6 +90,11 @@ This plugin does not send any data to external services.
 
 ## Changelog
 
+### 1.2.0
+- Added partial match and exact line match options.
+- Added MU Plugins scanning option.
+- Improved search controls for better precision.
+
 ### 1.1.0
 - Added case-sensitive search option
 - Added result count summary
