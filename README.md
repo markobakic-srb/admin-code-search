@@ -1,4 +1,4 @@
-![Admin Code Search Banner](assets/github-banner.png)
+[Admin Code Search Banner](assets/github-banner.png)
 # Admin Code Search
 
 Search code inside active themes and plugins directly from the WordPress admin area.
