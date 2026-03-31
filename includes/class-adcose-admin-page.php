@@ -45,7 +45,12 @@ class ADCOSE_Admin_Page {
 
 		if ( $data['submitted'] && empty( $data['error'] ) ) {
 			if ( ! empty( $data['results'] ) ) {
-				$this->render_results( $data['results'], $data['term'] );
+				$this->render_results(
+					$data['results'],
+					$data['term'],
+					$data['summary'],
+					$data['case_sensitive']
+				);
 			} else {
 				echo '<div class="notice notice-info"><p>' . esc_html__( 'No matches found.', 'admin-code-search' ) . '</p></div>';
 			}
@@ -61,13 +66,18 @@ class ADCOSE_Admin_Page {
 	 */
 	private function get_form_data() {
 		$data = array(
-			'term'         => '',
-			'exts'         => 'php',
-			'scan_plugins' => true,
-			'scan_themes'  => true,
-			'submitted'    => false,
-			'error'        => '',
-			'results'      => array(),
+			'term'           => '',
+			'exts'           => 'php',
+			'scan_plugins'   => true,
+			'scan_themes'    => true,
+			'case_sensitive' => false,
+			'submitted'      => false,
+			'error'          => '',
+			'results'        => array(),
+			'summary'        => array(
+				'total_matches' => 0,
+				'total_files'   => 0,
+			),
 		);
 
 		if ( isset( $_POST['term'] ) ) {
@@ -78,8 +88,9 @@ class ADCOSE_Admin_Page {
 			$data['exts'] = sanitize_text_field( wp_unslash( $_POST['exts'] ) );
 		}
 
-		$data['scan_plugins'] = isset( $_POST['scan_plugins'] );
-		$data['scan_themes']  = isset( $_POST['scan_themes'] );
+		$data['scan_plugins']   = isset( $_POST['scan_plugins'] );
+		$data['scan_themes']    = isset( $_POST['scan_themes'] );
+		$data['case_sensitive'] = isset( $_POST['case_sensitive'] );
 
 		if ( ! isset( $_POST['adcose_do_search'] ) ) {
 			return $data;
@@ -129,8 +140,17 @@ class ADCOSE_Admin_Page {
 			'.svn',
 		);
 
-		$scanner = new ADCOSE_Scanner();
-		$data['results'] = $scanner->scan( $dirs, $data['term'], $extensions, $exclude_names );
+		$scanner   = new ADCOSE_Scanner();
+		$scan_data = $scanner->scan(
+			$dirs,
+			$data['term'],
+			$extensions,
+			$exclude_names,
+			$data['case_sensitive']
+		);
+
+		$data['results'] = $scan_data['results'];
+		$data['summary'] = $scan_data['summary'];
 
 		return $data;
 	}
@@ -171,6 +191,13 @@ class ADCOSE_Admin_Page {
 		echo '</td>';
 		echo '</tr>';
 
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Options', 'admin-code-search' ) . '</th>';
+		echo '<td>';
+		echo '<label><input type="checkbox" name="case_sensitive" value="1" ' . checked( $data['case_sensitive'], true, false ) . '> ' . esc_html__( 'Case-sensitive search', 'admin-code-search' ) . '</label>';
+		echo '</td>';
+		echo '</tr>';
+
 		echo '</tbody></table>';
 
 		echo '<p class="description">' . esc_html__( 'Large searches may take time on sites with many plugins or large codebases.', 'admin-code-search' ) . '</p>';
@@ -185,20 +212,29 @@ class ADCOSE_Admin_Page {
 	/**
 	 * Render results table.
 	 *
-	 * @param array $results Search results.
+	 * @param array   $results        Search results.
+	 * @param string  $term           Search term.
+	 * @param array   $summary        Search summary.
+	 * @param boolean $case_sensitive Whether search is case-sensitive.
 	 * @return void
 	 */
-	private function render_results( $results, $term ) {
-		$total_matches = 0;
+	private function render_results( $results, $term, $summary, $case_sensitive ) {
+		echo '<h2>' . esc_html__( 'Results', 'admin-code-search' ) . '</h2>';
 
-		foreach ( $results as $file => $rows ) {
-			$total_matches += count( $rows );
-		}
+		echo '<p class="description">';
+		echo sprintf(
+			/* translators: 1: total matches, 2: matched files */
+			esc_html__( '%1$d matches found in %2$d files.', 'admin-code-search' ),
+			intval( $summary['total_matches'] ),
+			intval( $summary['total_files'] )
+		);
+		echo '</p>';
 
-		echo '<h2>';
-		echo esc_html__( 'Results', 'admin-code-search' ) . ' ';
-		echo '<span class="description">(' . intval( $total_matches ) . ' ' . esc_html__( 'matches', 'admin-code-search' ) . ' ' . esc_html__( 'in', 'admin-code-search' ) . ' ' . intval( count( $results ) ) . ' ' . esc_html__( 'files', 'admin-code-search' ) . ')</span>';
-		echo '</h2>';
+		echo '<p class="description">';
+		echo $case_sensitive
+			? esc_html__( 'Search mode: Case-sensitive.', 'admin-code-search' )
+			: esc_html__( 'Search mode: Case-insensitive.', 'admin-code-search' );
+		echo '</p>';
 
 		echo '<table class="widefat striped adcose-results-table">';
 		echo '<thead><tr>';
@@ -210,17 +246,17 @@ class ADCOSE_Admin_Page {
 
 		foreach ( $results as $file => $rows ) {
 			foreach ( $rows as $row ) {
+				$highlighted = ADCOSE_Helpers::highlight_term( $row['text'], $term );
+
 				echo '<tr>';
 				echo '<td class="adcose-file-cell">' . esc_html( ADCOSE_Helpers::relative_path( $file ) ) . '</td>';
 				echo '<td>' . intval( $row['line'] ) . '</td>';
-				$highlighted = ADCOSE_Helpers::highlight_term( $row['text'], $term );
-
-echo '<td><code class="adcose-snippet">' . wp_kses(
-	$highlighted,
-	array(
-		'mark' => array(),
-	)
-) . '</code></td>';
+				echo '<td><code class="adcose-snippet">' . wp_kses(
+					$highlighted,
+					array(
+						'mark' => array(),
+					)
+				) . '</code></td>';
 				echo '</tr>';
 			}
 		}
@@ -228,5 +264,4 @@ echo '<td><code class="adcose-snippet">' . wp_kses(
 		echo '</tbody>';
 		echo '</table>';
 	}
-
 }

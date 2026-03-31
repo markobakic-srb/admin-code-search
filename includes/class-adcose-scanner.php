@@ -9,14 +9,19 @@ class ADCOSE_Scanner {
 	/**
 	 * Scan directories for matching lines.
 	 *
-	 * @param array  $dirs          Directories to scan.
-	 * @param string $term          Search term.
-	 * @param array  $extensions    Allowed file extensions.
-	 * @param array  $exclude_names Excluded path fragments.
+	 * @param array   $dirs           Directories to scan.
+	 * @param string  $term           Search term.
+	 * @param array   $extensions     Allowed file extensions.
+	 * @param array   $exclude_names  Excluded path fragments.
+	 * @param boolean $case_sensitive Whether search is case-sensitive.
 	 * @return array
 	 */
-	public function scan( $dirs, $term, $extensions, $exclude_names ) {
+	public function scan( $dirs, $term, $extensions, $exclude_names, $case_sensitive = false ) {
 		$results = array();
+		$summary = array(
+			'total_matches' => 0,
+			'total_files'   => 0,
+		);
 
 		$flags = FilesystemIterator::SKIP_DOTS;
 
@@ -28,7 +33,7 @@ class ADCOSE_Scanner {
 			$iterator = new RecursiveIteratorIterator(
 				new RecursiveCallbackFilterIterator(
 					new RecursiveDirectoryIterator( $base_dir, $flags ),
-					function( $current ) use ( $extensions, $exclude_names ) {
+					function ( $current ) use ( $extensions, $exclude_names ) {
 						$pathname = $current->getPathname();
 
 						if ( $current->isDir() ) {
@@ -37,6 +42,7 @@ class ADCOSE_Scanner {
 									return false;
 								}
 							}
+
 							return true;
 						}
 
@@ -53,27 +59,37 @@ class ADCOSE_Scanner {
 
 			foreach ( $iterator as $file_info ) {
 				$file_path = $file_info->getPathname();
-				$this->scan_file( $file_path, $term, $results );
+				$this->scan_file( $file_path, $term, $results, $summary, $case_sensitive );
 			}
 		}
 
 		ksort( $results );
+		$summary['total_files'] = count( $results );
 
-		return $results;
+		return array(
+			'results' => $results,
+			'summary' => $summary,
+		);
 	}
 
 	/**
 	 * Scan a single file line-by-line.
 	 *
-	 * @param string $file_path File path.
-	 * @param string $term      Search term.
-	 * @param array  $results   Results array by reference.
+	 * @param string  $file_path      File path.
+	 * @param string  $term           Search term.
+	 * @param array   $results        Results array by reference.
+	 * @param array   $summary        Summary array by reference.
+	 * @param boolean $case_sensitive Whether search is case-sensitive.
 	 * @return void
 	 */
-	private function scan_file( $file_path, $term, &$results ) {
+	private function scan_file( $file_path, $term, &$results, &$summary, $case_sensitive = false ) {
 		try {
+			if ( ! is_readable( $file_path ) ) {
+				return;
+			}
+
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Line-by-line scanning is used intentionally to avoid loading full files into memory.
-$handle = @fopen( $file_path, 'r' );
+			$handle = fopen( $file_path, 'r' );
 
 			if ( ! $handle ) {
 				return;
@@ -84,16 +100,22 @@ $handle = @fopen( $file_path, 'r' );
 			while ( false !== ( $line = fgets( $handle ) ) ) {
 				$line_number++;
 
-				if ( false !== stripos( $line, $term ) ) {
+				$is_match = $case_sensitive
+					? false !== strpos( $line, $term )
+					: false !== stripos( $line, $term );
+
+				if ( $is_match ) {
 					$results[ $file_path ][] = array(
 						'line' => $line_number,
 						'text' => rtrim( $line, "\r\n" ),
 					);
+
+					$summary['total_matches']++;
 				}
 			}
 
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Paired with fopen() for efficient line-by-line scanning.
-fclose( $handle );
+			fclose( $handle );
 		} catch ( \Throwable $e ) {
 			// Ignore unreadable files.
 		}

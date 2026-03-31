@@ -4,7 +4,7 @@ Tags: developer, code, search, admin tools, debugging
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,11 @@ No. All searches are performed locally on your server.
 4. Detailed result with file path, line number, and highlighted match
 
 == Changelog ==
+
+= 1.1.0 =
+* Added case-sensitive search option.
+* Added result count summary.
+* Improved scanner handling for readable files.
 
 = 1.0.0 =
 * Initial public release.
