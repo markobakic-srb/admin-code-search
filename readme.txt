@@ -4,26 +4,43 @@ Tags: developer, code, search, admin tools, debugging
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Search code inside active themes and plugins directly from the WordPress admin area.
+Search code across active plugins, themes, and MU plugins directly from the WordPress admin.
 
 == Description ==
 
-Admin Code Search is a lightweight developer utility that lets you search code inside active themes and plugins directly from the WordPress admin. Designed for developers who need quick insight into code without leaving wp-admin.
+Admin Code Search is a lightweight developer tool that lets you search code directly from the WordPress admin area — no FTP or terminal access required.
 
-Useful when you need to quickly locate a function, hook, class, or string without leaving the dashboard or accessing files via FTP or IDE.
+It scans active plugins, themes, and MU plugins line-by-line and shows matching results with file paths and line numbers.
 
-Features:
-- Admin-only access
-- Search across active plugins
-- Search active theme (including parent theme)
-- Support for custom file extensions
-- Line-by-line results
-- Highlighted matches
-- Clean, readable results table
+Designed for quick debugging, code tracing, and locating specific hooks, functions, or strings across a site.
+
+A simple, fast code search tool for developers working inside WordPress.
+
+== Features ==
+
+- Search inside active plugins, themes, and MU plugins
+- Case-sensitive or case-insensitive search
+- Partial match or exact line match
+- Custom file extensions (e.g. php, js, css)
+- Line-by-line scanning for better performance on large codebases
+- Displays file path, line number, and highlighted match
+- Excludes common heavy directories (vendor, node_modules, uploads, cache, .git, .svn)
+- Admin-only access for security
+
+== Typical Use Cases ==
+
+- Locate where a function or hook is defined
+- Find all occurrences of a specific string
+- Debug custom integrations or third-party plugins
+- Quickly explore unfamiliar codebases without leaving wp-admin
+
+== Notes ==
+
+Large searches may take longer on sites with many plugins or large codebases. Results are processed in real time.
 
 = Privacy =
 
@@ -39,30 +56,25 @@ This plugin does not send any data to external services.
 == Frequently Asked Questions ==
 
 = Who can use this plugin? =
-
 Only administrators or users with the `manage_options` capability.
 
 = What files are searched? =
+The plugin scans active plugin files, the active theme, the parent theme (if different), and MU plugins.
 
-The plugin searches files in active plugins, the active theme, and the parent theme (if used).
-Inactive plugins and themes are not included.
+= What is the difference between partial match and exact line match? =
+Partial match finds the search term anywhere within a line. Exact line match only returns results where the entire trimmed line exactly matches the search term.
 
 = Can I search file types other than PHP? =
+Yes. You can enter comma-separated extensions such as `php,js,css,inc`.
 
-Yes. You can define custom file extensions (for example: php, js, css, inc).
+= Will this affect site performance? =
+Search runs on demand and only when triggered by an admin. On very large sites, searches may take a few seconds.
 
-= Does this affect site performance? =
+= Does it search WordPress core files? =
+No. The plugin is limited to plugins, themes, and MU plugins.
 
-Search runs only when you perform it manually in the admin.
-It does not run in the background or affect frontend performance.
-
-= Does this plugin modify any files? =
-
-No. The plugin is read-only and does not change any files.
-
-= Is any data sent outside my site? =
-
-No. All searches are performed locally on your server.
+= Is this plugin safe to use on production sites? =
+Yes. It is read-only and does not modify any files or data.
 
 == Screenshots ==
 
@@ -72,6 +84,11 @@ No. All searches are performed locally on your server.
 4. Detailed result with file path, line number, and highlighted match
 
 == Changelog ==
+
+= 1.2.0 =
+* Added partial match and exact line match options.
+* Added MU Plugins scanning option.
+* Improved search controls for better precision.
 
 = 1.1.0 =
 * Added case-sensitive search option.

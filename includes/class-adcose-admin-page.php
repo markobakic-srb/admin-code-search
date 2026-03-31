@@ -35,7 +35,7 @@ class ADCOSE_Admin_Page {
 
 		echo '<div class="wrap">';
 		echo '<h1>' . esc_html__( 'Code Search', 'admin-code-search' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Search code inside active themes and plugins directly from the WordPress admin area.', 'admin-code-search' ) . '</p>';
+		echo '<p>' . esc_html__( 'Search code inside active themes, MU plugins, and plugins directly from the WordPress admin area.', 'admin-code-search' ) . '</p>';
 
 		$this->render_form( $data );
 
@@ -49,7 +49,8 @@ class ADCOSE_Admin_Page {
 					$data['results'],
 					$data['term'],
 					$data['summary'],
-					$data['case_sensitive']
+					$data['case_sensitive'],
+					$data['match_mode']
 				);
 			} else {
 				echo '<div class="notice notice-info"><p>' . esc_html__( 'No matches found.', 'admin-code-search' ) . '</p></div>';
@@ -70,7 +71,9 @@ class ADCOSE_Admin_Page {
 			'exts'           => 'php',
 			'scan_plugins'   => true,
 			'scan_themes'    => true,
+			'scan_muplugins' => false,
 			'case_sensitive' => false,
+			'match_mode'     => 'partial',
 			'submitted'      => false,
 			'error'          => '',
 			'results'        => array(),
@@ -88,8 +91,14 @@ class ADCOSE_Admin_Page {
 			$data['exts'] = sanitize_text_field( wp_unslash( $_POST['exts'] ) );
 		}
 
+		if ( isset( $_POST['match_mode'] ) ) {
+			$match_mode = sanitize_text_field( wp_unslash( $_POST['match_mode'] ) );
+			$data['match_mode'] = in_array( $match_mode, array( 'partial', 'exact' ), true ) ? $match_mode : 'partial';
+		}
+
 		$data['scan_plugins']   = isset( $_POST['scan_plugins'] );
 		$data['scan_themes']    = isset( $_POST['scan_themes'] );
+		$data['scan_muplugins'] = isset( $_POST['scan_muplugins'] );
 		$data['case_sensitive'] = isset( $_POST['case_sensitive'] );
 
 		if ( ! isset( $_POST['adcose_do_search'] ) ) {
@@ -105,14 +114,14 @@ class ADCOSE_Admin_Page {
 			return $data;
 		}
 
-		if ( ! $data['scan_plugins'] && ! $data['scan_themes'] ) {
+		if ( ! $data['scan_plugins'] && ! $data['scan_themes'] && ! $data['scan_muplugins'] ) {
 			$data['error'] = __( 'Select at least one search location.', 'admin-code-search' );
 			return $data;
 		}
 
 		$dirs = array();
 
-		if ( $data['scan_plugins'] && defined( 'WP_PLUGIN_DIR' ) ) {
+		if ( $data['scan_plugins'] && defined( 'WP_PLUGIN_DIR' ) && is_dir( WP_PLUGIN_DIR ) ) {
 			$dirs[] = wp_normalize_path( WP_PLUGIN_DIR );
 		}
 
@@ -127,6 +136,10 @@ class ADCOSE_Admin_Page {
 			if ( $template_dir !== $stylesheet_dir && is_dir( $template_dir ) ) {
 				$dirs[] = $template_dir;
 			}
+		}
+
+		if ( $data['scan_muplugins'] && defined( 'WPMU_PLUGIN_DIR' ) && is_dir( WPMU_PLUGIN_DIR ) ) {
+			$dirs[] = wp_normalize_path( WPMU_PLUGIN_DIR );
 		}
 
 		$extensions = ADCOSE_Helpers::normalize_extensions( $data['exts'] );
@@ -146,7 +159,8 @@ class ADCOSE_Admin_Page {
 			$data['term'],
 			$extensions,
 			$exclude_names,
-			$data['case_sensitive']
+			$data['case_sensitive'],
+			$data['match_mode']
 		);
 
 		$data['results'] = $scan_data['results'];
@@ -187,7 +201,8 @@ class ADCOSE_Admin_Page {
 		echo '<th scope="row">' . esc_html__( 'Search in', 'admin-code-search' ) . '</th>';
 		echo '<td>';
 		echo '<label><input type="checkbox" name="scan_plugins" value="1" ' . checked( $data['scan_plugins'], true, false ) . '> ' . esc_html__( 'Plugins', 'admin-code-search' ) . '</label><br>';
-		echo '<label><input type="checkbox" name="scan_themes" value="1" ' . checked( $data['scan_themes'], true, false ) . '> ' . esc_html__( 'Themes', 'admin-code-search' ) . '</label>';
+		echo '<label><input type="checkbox" name="scan_themes" value="1" ' . checked( $data['scan_themes'], true, false ) . '> ' . esc_html__( 'Themes', 'admin-code-search' ) . '</label><br>';
+		echo '<label><input type="checkbox" name="scan_muplugins" value="1" ' . checked( $data['scan_muplugins'], true, false ) . '> ' . esc_html__( 'MU Plugins', 'admin-code-search' ) . '</label>';
 		echo '</td>';
 		echo '</tr>';
 
@@ -195,6 +210,12 @@ class ADCOSE_Admin_Page {
 		echo '<th scope="row">' . esc_html__( 'Options', 'admin-code-search' ) . '</th>';
 		echo '<td>';
 		echo '<label><input type="checkbox" name="case_sensitive" value="1" ' . checked( $data['case_sensitive'], true, false ) . '> ' . esc_html__( 'Case-sensitive search', 'admin-code-search' ) . '</label>';
+
+		echo '<p style="margin-top:10px;">';
+		echo '<strong>' . esc_html__( 'Match mode', 'admin-code-search' ) . '</strong><br>';
+		echo '<label><input type="radio" name="match_mode" value="partial" ' . checked( $data['match_mode'], 'partial', false ) . '> ' . esc_html__( 'Partial match', 'admin-code-search' ) . '</label><br>';
+		echo '<label><input type="radio" name="match_mode" value="exact" ' . checked( $data['match_mode'], 'exact', false ) . '> ' . esc_html__( 'Exact line match', 'admin-code-search' ) . '</label>';
+		echo '</p>';
 		echo '</td>';
 		echo '</tr>';
 
@@ -216,9 +237,10 @@ class ADCOSE_Admin_Page {
 	 * @param string  $term           Search term.
 	 * @param array   $summary        Search summary.
 	 * @param boolean $case_sensitive Whether search is case-sensitive.
+	 * @param string  $match_mode     Match mode.
 	 * @return void
 	 */
-	private function render_results( $results, $term, $summary, $case_sensitive ) {
+	private function render_results( $results, $term, $summary, $case_sensitive, $match_mode ) {
 		echo '<h2>' . esc_html__( 'Results', 'admin-code-search' ) . '</h2>';
 
 		echo '<p class="description">';
@@ -234,6 +256,12 @@ class ADCOSE_Admin_Page {
 		echo $case_sensitive
 			? esc_html__( 'Search mode: Case-sensitive.', 'admin-code-search' )
 			: esc_html__( 'Search mode: Case-insensitive.', 'admin-code-search' );
+		echo '</p>';
+
+		echo '<p class="description">';
+		echo 'exact' === $match_mode
+			? esc_html__( 'Match mode: Exact line match.', 'admin-code-search' )
+			: esc_html__( 'Match mode: Partial match.', 'admin-code-search' );
 		echo '</p>';
 
 		echo '<table class="widefat striped adcose-results-table">';

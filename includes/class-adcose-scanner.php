@@ -14,9 +14,10 @@ class ADCOSE_Scanner {
 	 * @param array   $extensions     Allowed file extensions.
 	 * @param array   $exclude_names  Excluded path fragments.
 	 * @param boolean $case_sensitive Whether search is case-sensitive.
+	 * @param string  $match_mode     Match mode: partial or exact.
 	 * @return array
 	 */
-	public function scan( $dirs, $term, $extensions, $exclude_names, $case_sensitive = false ) {
+	public function scan( $dirs, $term, $extensions, $exclude_names, $case_sensitive = false, $match_mode = 'partial' ) {
 		$results = array();
 		$summary = array(
 			'total_matches' => 0,
@@ -59,7 +60,7 @@ class ADCOSE_Scanner {
 
 			foreach ( $iterator as $file_info ) {
 				$file_path = $file_info->getPathname();
-				$this->scan_file( $file_path, $term, $results, $summary, $case_sensitive );
+				$this->scan_file( $file_path, $term, $results, $summary, $case_sensitive, $match_mode );
 			}
 		}
 
@@ -80,9 +81,10 @@ class ADCOSE_Scanner {
 	 * @param array   $results        Results array by reference.
 	 * @param array   $summary        Summary array by reference.
 	 * @param boolean $case_sensitive Whether search is case-sensitive.
+	 * @param string  $match_mode     Match mode: partial or exact.
 	 * @return void
 	 */
-	private function scan_file( $file_path, $term, &$results, &$summary, $case_sensitive = false ) {
+	private function scan_file( $file_path, $term, &$results, &$summary, $case_sensitive = false, $match_mode = 'partial' ) {
 		try {
 			if ( ! is_readable( $file_path ) ) {
 				return;
@@ -99,15 +101,25 @@ class ADCOSE_Scanner {
 
 			while ( false !== ( $line = fgets( $handle ) ) ) {
 				$line_number++;
+				$line_to_check = rtrim( $line, "\r\n" );
 
-				$is_match = $case_sensitive
-					? false !== strpos( $line, $term )
-					: false !== stripos( $line, $term );
+				if ( 'exact' === $match_mode ) {
+					$left  = trim( $line_to_check );
+					$right = trim( $term );
+
+					$is_match = $case_sensitive
+						? $left === $right
+						: strtolower( $left ) === strtolower( $right );
+				} else {
+					$is_match = $case_sensitive
+						? false !== strpos( $line_to_check, $term )
+						: false !== stripos( $line_to_check, $term );
+				}
 
 				if ( $is_match ) {
 					$results[ $file_path ][] = array(
 						'line' => $line_number,
-						'text' => rtrim( $line, "\r\n" ),
+						'text' => $line_to_check,
 					);
 
 					$summary['total_matches']++;
