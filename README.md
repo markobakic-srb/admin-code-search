@@ -90,6 +90,12 @@ This plugin does not send any data to external services.
 
 ## Changelog
 
+### 1.1.0
+- Added case-sensitive search option
+- Added result count summary
+- Improved scanner handling for readable files
+- Internal refactoring and codebase cleanup
+
 ### 1.0.0
 - Initial public release.
 
