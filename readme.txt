@@ -20,6 +20,17 @@ Designed for quick debugging, code tracing, and locating specific hooks, functio
 
 A simple, fast code search tool for developers working inside WordPress.
 
+== Why use Admin Code Search? ==
+
+Searching through plugin and theme files manually is slow and often requires FTP, file manager access, or local copies.
+
+Admin Code Search brings that functionality directly into wp-admin, allowing you to:
+
+– Search plugin and theme code instantly  
+– Locate functions, hooks, and strings across files  
+– Debug third-party plugins more efficiently  
+– Work directly on live environments without leaving WordPress
+
 == Features ==
 
 - Search inside active plugins, themes, and MU plugins
@@ -36,7 +47,15 @@ A simple, fast code search tool for developers working inside WordPress.
 - Locate where a function or hook is defined
 - Find all occurrences of a specific string
 - Debug custom integrations or third-party plugins
+– Debug issues without FTP access  
 - Quickly explore unfamiliar codebases without leaving wp-admin
+
+== Who is this for? ==
+
+– WordPress developers  
+– Freelancers working on client sites  
+– Agencies maintaining multiple projects  
+– Anyone who needs quick code search inside WordPress  
 
 == Notes ==
 
