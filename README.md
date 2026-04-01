@@ -90,6 +90,10 @@ This plugin does not send any data to external services.
 
 ## Changelog
 
+### 1.2.1
+- Renamed Exact line match to Match entire line exactly for better clarity.
+- Improved match mode labeling in results output
+
 ### 1.2.0
 - Added partial match and exact line match options.
 - Added MU Plugins scanning option.
