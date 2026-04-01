@@ -91,8 +91,9 @@ This plugin does not send any data to external services.
 ## Changelog
 
 ### 1.2.1
-- Renamed Exact line match to Match entire line exactly for better clarity.
-- Improved match mode labeling in results output
+- Added whole word match option.
+- Renamed exact line match option to “Match entire line exactly” for clarity.
+- Improved match mode labeling in the search results.
 
 ### 1.2.0
 - Added partial match and exact line match options.
