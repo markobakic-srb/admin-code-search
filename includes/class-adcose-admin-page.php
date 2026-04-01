@@ -93,7 +93,7 @@ class ADCOSE_Admin_Page {
 
 		if ( isset( $_POST['match_mode'] ) ) {
 			$match_mode = sanitize_text_field( wp_unslash( $_POST['match_mode'] ) );
-			$data['match_mode'] = in_array( $match_mode, array( 'partial', 'exact' ), true ) ? $match_mode : 'partial';
+			$data['match_mode'] = in_array( $match_mode, array( 'partial', 'whole_word', 'exact' ), true ) ? $match_mode : 'partial';
 		}
 
 		$data['scan_plugins']   = isset( $_POST['scan_plugins'] );
@@ -214,7 +214,8 @@ class ADCOSE_Admin_Page {
 		echo '<p style="margin-top:10px;">';
 		echo '<strong>' . esc_html__( 'Match mode', 'admin-code-search' ) . '</strong><br>';
 		echo '<label><input type="radio" name="match_mode" value="partial" ' . checked( $data['match_mode'], 'partial', false ) . '> ' . esc_html__( 'Partial match', 'admin-code-search' ) . '</label><br>';
-		echo '<label><input type="radio" name="match_mode" value="exact" ' . checked( $data['match_mode'], 'exact', false ) . '> ' . esc_html__( 'Exact line match', 'admin-code-search' ) . '</label>';
+		echo '<label><input type="radio" name="match_mode" value="whole_word" ' . checked( $data['match_mode'], 'whole_word', false ) . '> ' . esc_html__( 'Whole word match', 'admin-code-search' ) . '</label><br>';
+		echo '<label><input type="radio" name="match_mode" value="exact" ' . checked( $data['match_mode'], 'exact', false ) . '> ' . esc_html__( 'Match entire line exactly', 'admin-code-search' ) . '</label>';
 		echo '</p>';
 		echo '</td>';
 		echo '</tr>';
@@ -259,9 +260,15 @@ class ADCOSE_Admin_Page {
 		echo '</p>';
 
 		echo '<p class="description">';
-		echo 'exact' === $match_mode
-			? esc_html__( 'Match mode: Exact line match.', 'admin-code-search' )
-			: esc_html__( 'Match mode: Partial match.', 'admin-code-search' );
+
+		if ( 'exact' === $match_mode ) {
+			echo esc_html__( 'Match mode: Match entire line exactly.', 'admin-code-search' );
+		} elseif ( 'whole_word' === $match_mode ) {
+			echo esc_html__( 'Match mode: Whole word match.', 'admin-code-search' );
+		} else {
+			echo esc_html__( 'Match mode: Partial match.', 'admin-code-search' );
+		}
+
 		echo '</p>';
 
 		echo '<table class="widefat striped adcose-results-table">';

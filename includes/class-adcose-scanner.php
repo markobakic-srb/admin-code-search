@@ -14,7 +14,7 @@ class ADCOSE_Scanner {
 	 * @param array   $extensions     Allowed file extensions.
 	 * @param array   $exclude_names  Excluded path fragments.
 	 * @param boolean $case_sensitive Whether search is case-sensitive.
-	 * @param string  $match_mode     Match mode: partial or exact.
+	 * @param string  $match_mode     Match mode: partial, whole_word, or exact.
 	 * @return array
 	 */
 	public function scan( $dirs, $term, $extensions, $exclude_names, $case_sensitive = false, $match_mode = 'partial' ) {
@@ -81,55 +81,58 @@ class ADCOSE_Scanner {
 	 * @param array   $results        Results array by reference.
 	 * @param array   $summary        Summary array by reference.
 	 * @param boolean $case_sensitive Whether search is case-sensitive.
-	 * @param string  $match_mode     Match mode: partial or exact.
+	 * @param string  $match_mode     Match mode: partial, whole_word, or exact.
 	 * @return void
 	 */
 	private function scan_file( $file_path, $term, &$results, &$summary, $case_sensitive = false, $match_mode = 'partial' ) {
-		try {
-			if ( ! is_readable( $file_path ) ) {
-				return;
-			}
-
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Line-by-line scanning is used intentionally to avoid loading full files into memory.
-			$handle = fopen( $file_path, 'r' );
-
-			if ( ! $handle ) {
-				return;
-			}
-
-			$line_number = 0;
-
-			while ( false !== ( $line = fgets( $handle ) ) ) {
-				$line_number++;
-				$line_to_check = rtrim( $line, "\r\n" );
-
-				if ( 'exact' === $match_mode ) {
-					$left  = trim( $line_to_check );
-					$right = trim( $term );
-
-					$is_match = $case_sensitive
-						? $left === $right
-						: strtolower( $left ) === strtolower( $right );
-				} else {
-					$is_match = $case_sensitive
-						? false !== strpos( $line_to_check, $term )
-						: false !== stripos( $line_to_check, $term );
-				}
-
-				if ( $is_match ) {
-					$results[ $file_path ][] = array(
-						'line' => $line_number,
-						'text' => $line_to_check,
-					);
-
-					$summary['total_matches']++;
-				}
-			}
-
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Paired with fopen() for efficient line-by-line scanning.
-			fclose( $handle );
-		} catch ( \Throwable $e ) {
-			// Ignore unreadable files.
+	try {
+		if ( ! is_readable( $file_path ) ) {
+			return;
 		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Line-by-line scanning is used intentionally to avoid loading full files into memory.
+		$handle = fopen( $file_path, 'r' );
+
+		if ( ! $handle ) {
+			return;
+		}
+
+		$line_number = 0;
+
+		while ( false !== ( $line = fgets( $handle ) ) ) {
+			$line_number++;
+			$line_to_check = rtrim( $line, "\r\n" );
+
+			if ( 'exact' === $match_mode ) {
+				$left  = trim( $line_to_check );
+				$right = trim( $term );
+
+				$is_match = $case_sensitive
+					? $left === $right
+					: strtolower( $left ) === strtolower( $right );
+			} elseif ( 'whole_word' === $match_mode ) {
+				$pattern = '/\b' . preg_quote( $term, '/' ) . '\b/' . ( $case_sensitive ? '' : 'i' );
+				$is_match = 1 === preg_match( $pattern, $line_to_check );
+			} else {
+				$is_match = $case_sensitive
+					? false !== strpos( $line_to_check, $term )
+					: false !== stripos( $line_to_check, $term );
+			}
+
+			if ( $is_match ) {
+				$results[ $file_path ][] = array(
+					'line' => $line_number,
+					'text' => $line_to_check,
+				);
+
+				$summary['total_matches']++;
+			}
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Paired with fopen() for efficient line-by-line scanning.
+		fclose( $handle );
+	} catch ( \Throwable $e ) {
+		// Ignore unreadable files.
 	}
+}
 }

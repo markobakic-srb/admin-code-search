@@ -3,7 +3,7 @@
  * Plugin Name: Admin Code Search
  * Plugin URI: https://wordpress.org/plugins/admin-code-search/
  * Description: Search code inside active themes and plugins directly from the WordPress admin area.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Marko Bakic
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ADCOSE_VERSION', '1.2.0' );
+define( 'ADCOSE_VERSION', '1.2.1' );
 define( 'ADCOSE_FILE', __FILE__ );
 define( 'ADCOSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ADCOSE_URL', plugin_dir_url( __FILE__ ) );
