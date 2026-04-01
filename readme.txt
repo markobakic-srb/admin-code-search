@@ -1,6 +1,6 @@
 === Admin Code Search ===
 Contributors: marbak
-Tags: developer, code, search, admin tools, debugging
+Tags: code search, search plugins, search themes, debugging, developer tools
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
