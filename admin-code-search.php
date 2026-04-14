@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ADCOSE_VERSION', '1.2.1' );
+define( 'ADCOSE_VERSION', '1.2.2' );
 define( 'ADCOSE_FILE', __FILE__ );
 define( 'ADCOSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ADCOSE_URL', plugin_dir_url( __FILE__ ) );
