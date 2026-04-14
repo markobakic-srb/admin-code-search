@@ -80,6 +80,8 @@ class ADCOSE_Admin_Page {
 			'summary'        => array(
 				'total_matches' => 0,
 				'total_files'   => 0,
+				'was_limited'   => false,
+				'result_limit'  => ADCOSE_Scanner::MAX_RESULTS,
 			),
 		);
 
@@ -100,6 +102,27 @@ class ADCOSE_Admin_Page {
 		$data['scan_themes']    = isset( $_POST['scan_themes'] );
 		$data['scan_muplugins'] = isset( $_POST['scan_muplugins'] );
 		$data['case_sensitive'] = isset( $_POST['case_sensitive'] );
+
+		if ( isset( $_POST['adcose_do_clear'] ) ) {
+			return array(
+				'term'           => '',
+				'exts'           => 'php',
+				'scan_plugins'   => true,
+				'scan_themes'    => true,
+				'scan_muplugins' => false,
+				'case_sensitive' => false,
+				'match_mode'     => 'partial',
+				'submitted'      => false,
+				'error'          => '',
+				'results'        => array(),
+				'summary'        => array(
+					'total_matches' => 0,
+					'total_files'   => 0,
+					'was_limited'   => false,
+					'result_limit'  => ADCOSE_Scanner::MAX_RESULTS,
+				),
+			);
+		}
 
 		if ( ! isset( $_POST['adcose_do_search'] ) ) {
 			return $data;
@@ -225,7 +248,8 @@ class ADCOSE_Admin_Page {
 		echo '<p class="description">' . esc_html__( 'Large searches may take time on sites with many plugins or large codebases.', 'admin-code-search' ) . '</p>';
 
 		echo '<p>';
-		echo '<button type="submit" name="adcose_do_search" value="1" class="button button-primary">' . esc_html__( 'Search', 'admin-code-search' ) . '</button>';
+		echo '<button type="submit" name="adcose_do_search" value="1" class="button button-primary">' . esc_html__( 'Search', 'admin-code-search' ) . '</button> ';
+		echo '<button type="submit" name="adcose_do_clear" value="1" class="button">' . esc_html__( 'Clear', 'admin-code-search' ) . '</button>';
 		echo '</p>';
 
 		echo '</form>';
@@ -252,6 +276,16 @@ class ADCOSE_Admin_Page {
 			intval( $summary['total_files'] )
 		);
 		echo '</p>';
+
+		if ( ! empty( $summary['was_limited'] ) ) {
+			echo '<div class="notice notice-warning inline"><p>';
+			echo sprintf(
+				/* translators: %d: maximum number of results shown */
+				esc_html__( 'Showing first %d matches. Refine your search to narrow results.', 'admin-code-search' ),
+				intval( $summary['result_limit'] )
+			);
+			echo '</p></div>';
+		}
 
 		echo '<p class="description">';
 		echo $case_sensitive

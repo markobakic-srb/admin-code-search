@@ -17,10 +17,16 @@ Built for developers who need quick insight into a codebase — whether you're t
 
 - Admin-only access
 - Search across active plugins
-- Search active theme (including parent theme)
-- Support for custom file extensions (e.g. php, js, css, inc)
-- Line-by-line results
+- Search active theme and parent theme
+- Search MU plugins
+- Support for custom file extensions (for example: php, js, css, inc)
+- Case-sensitive or case-insensitive search
+- Partial match, whole word match, or match entire line exactly
+- Line-by-line scanning
 - Highlighted matches
+- Result count summary
+- Result limit protection (first 500 matches)
+- Clear button to reset search form and results
 - Clean, readable results table
 
 ---
@@ -36,9 +42,14 @@ Built for developers who need quick insight into a codebase — whether you're t
 
 ## Usage
 
-Enter any keyword, function name, hook, or string and scan your active theme and plugins.
+Enter any keyword, function name, hook, or string and scan your active plugins, themes, and MU plugins.
 
-You can optionally define which file types to include in the search.
+You can also:
+
+- define which file extensions to include
+- switch between case-sensitive and case-insensitive search
+- choose between partial match, whole word match, and matching the entire line exactly
+- clear the form and results with one click
 
 ---
 
@@ -48,15 +59,23 @@ You can optionally define which file types to include in the search.
 Only administrators or users with the `manage_options` capability.
 
 **What files are searched?**  
-Files in active plugins, the active theme, and the parent theme (if used).  
+Files in active plugins, the active theme, the parent theme (if used), and MU plugins.  
 Inactive plugins and themes are not included.
 
+**What is the difference between the match modes?**  
+- **Partial match** finds the search term anywhere in a line  
+- **Whole word match** finds the term as a distinct word  
+- **Match entire line exactly** only returns results where the whole trimmed line exactly matches the search term
+
 **Can I search file types other than PHP?**  
-Yes. You can define custom file extensions (for example: php, js, css, inc).
+Yes. You can define custom file extensions such as `php, js, css, inc`.
 
 **Does this affect site performance?**  
 Search runs only when triggered manually in the admin.  
-It does not run in the background or affect frontend performance.
+On very large sites, broad searches may take longer.
+
+**Why do I only see 500 results?**  
+To keep searches fast and manageable, the plugin limits output to the first 500 matches. If the limit is reached, refine your search term or narrow the search scope.
 
 **Does this plugin modify any files?**  
 No. The plugin is read-only.
@@ -89,6 +108,13 @@ This plugin does not send any data to external services.
 ---
 
 ## Changelog
+
+### 1.2.2
+- Added whole word match.
+- Renamed exact line match to “Match entire line exactly” for clarity.
+- Added a 500-result limit for broad searches.
+- Added a warning when the result limit is reached.
+- Added a Clear button to reset the search form and results.
 
 ### 1.2.1
 - Added whole word match option.
